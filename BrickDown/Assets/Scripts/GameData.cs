@@ -10,8 +10,8 @@ public class GameData {
 
     public GameData() {
         upgradeData[0] = 1;
-        for(int i = 1 ; i < 2 ; i++) {
-            upgradeData[i] = -1;
+        for(int i = 1 ; i < 10 ; i++) {
+            upgradeData[i] = 0;
         }
         highScore = 0;
         money = 0;

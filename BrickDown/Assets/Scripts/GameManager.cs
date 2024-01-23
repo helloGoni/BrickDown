@@ -15,13 +15,16 @@ public class GameManager : MonoBehaviour
     public GameObject ParticleBlue_P, ParticleGreen_P, ParticleRed_P;
     public GameObject GameoverPanel;
     public GameObject NormalBallPreview,Arrow;
+    public GameObject LeftBtn, RightBtn;
+    public GameObject[] weaponSlot = new GameObject[10];
     
     public NormalBall normalBall;
 
     public Transform BallGroup, BrickGroup;
 
     public LineRenderer Mouse_LR, Ball_LR;
-    public TMP_Text ScoreText_TMP, MoneyText_TMP;
+    public TMP_Text ScoreText_TMP, MoneyText_TMP, EndScoreText_TMP;
+    public TMP_Text[] weaponSlotValue = new TMP_Text[10];
 
     public Color[] brickColor;
     public Color greenColor;
@@ -36,10 +39,7 @@ public class GameManager : MonoBehaviour
     public float timeDelay;
 
     public int nowWeapon;
-    public int[] upgradeWeapon = new int[5];
-
-    
-
+    public int[] upgradeWeapon = new int[10];
 
     #endregion
 
@@ -61,8 +61,8 @@ public class GameManager : MonoBehaviour
     }
 
     void Update() {
-        RenewMoney();
         if(isDie) return;
+        RenewMoney();
         if(Input.GetMouseButtonDown(0)) {
             firstPos_Mouse =  Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0,0,10);
         }
@@ -140,9 +140,11 @@ public class GameManager : MonoBehaviour
 
 
     #region 게임시작 / 종료
+
     void Init() {
         score = 0;
-        nowWeapon = 0;
+        upgradeWeapon = SaveManager.instance.ReturnUpgrade();
+        SetWeapon();
         Vector3 start = new Vector3(0,54.87391f,0);
         SetStartPos(start);
         StartBrick();
@@ -155,6 +157,20 @@ public class GameManager : MonoBehaviour
     public void Gameover() {
         SaveManager.instance.Gameover(score,money);
         GameoverPanel.SetActive(true);
+    }
+
+    public void SetWeapon() {
+        nowWeapon = 0;
+        if(upgradeWeapon[1] == 0) {
+            LeftBtn.SetActive(false);
+            RightBtn.SetActive(false);
+        }
+        for(int i = 0 ; i < 10 ; i++) {
+            if(weaponSlot[i] != null) {
+                weaponSlotValue[i].text = upgradeWeapon[i].ToString();
+            }
+        }
+        RenewWeapon();
     }
 
     #endregion
@@ -265,7 +281,7 @@ public class GameManager : MonoBehaviour
 
     #endregion
 
-    #region 연출 / 표현 
+    #region 연출 / 표현 / 설정
 
     void RenewMoney() {
         MoneyText_TMP.text = money.ToString();
@@ -273,20 +289,22 @@ public class GameManager : MonoBehaviour
 
     void RenewScore() {
         ScoreText_TMP.text = "<size=140>" + (score).ToString() + "</size> Round";
+        EndScoreText_TMP.text = (score).ToString() + " Round";
     }
 
     void RenewWeapon() {
-        switch(1) {
-            case 0:
-                break;
-            default:
-                break;
+        for(int i = 0 ; i < 10 ; i++) {
+            if(weaponSlot[i] != null) {
+                weaponSlot[i].SetActive(false);
+            }
         }
+        weaponSlot[nowWeapon].SetActive(true);
     }
+
 
     #endregion
 
-    #region 전체 Shot 
+    #region 전체 Shot 관련
 
     public void SetStartPos(Vector3 pos) {
         if(ballStartPos == Vector3.zero) {
@@ -298,21 +316,21 @@ public class GameManager : MonoBehaviour
 
     #region Weapon Chanage
 
-    void NextWeapon() {
+    public void NextWeapon() {
         nowWeapon++;
-        /*
-        if() {
+        if(upgradeWeapon[nowWeapon] < 1) {
             nowWeapon = 0;
-        }*/
+        }
         RenewWeapon();
     }
-    void PreviousWeapon() {
+    public void PreviousWeapon() {
         nowWeapon--;
-        /*
-        if(nowWeapon) {
-
+        if(nowWeapon<0) {
+            nowWeapon = 9;
+            while(upgradeWeapon[nowWeapon] <= 0) {
+                nowWeapon--;
+            }
         }
-        */
         RenewWeapon();
     }
 

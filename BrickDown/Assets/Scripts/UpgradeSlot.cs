@@ -27,9 +27,6 @@ public class UpgradeSlot : MonoBehaviour
         }
     }
 
-    public void ShowUnlock() {
-
-    }
 
     public void ShowNormalBall() {
         

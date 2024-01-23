@@ -87,5 +87,9 @@ public class SaveManager : MonoBehaviour
         return data.highScore;
     }
 
+    public int[] ReturnUpgrade() {
+        return data.upgradeData;
+    }
     #endregion
+
 }
