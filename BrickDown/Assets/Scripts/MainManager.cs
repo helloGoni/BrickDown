@@ -23,8 +23,6 @@ public class MainManager : MonoBehaviour
         moneyText.text = SaveManager.instance.ReturnMoney().ToString();
     }
 
-
-    //방치?느낌도 있고 그냥 켜 놓으면 돈준느 느낌도 있게
     public void PlayGame() {
         SceneManager.LoadScene("GameScene");
     }

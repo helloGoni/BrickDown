@@ -4,15 +4,34 @@ using UnityEngine;
 
 public class BounceBall : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+    GameManager GM;
+    public Rigidbody2D RB2D;
+    public bool isMoving;
+
+    void Start() {
+        GM = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    public void Shot(Vector3 pos) {
+        GM.shotTrigger = true;
+        isMoving = true;
+        RB2D.AddForce(pos * 7000);
+    }
+
+    IEnumerator OnCollisionEnter2D(Collision2D col2D) {
+        GameObject obj = col2D.gameObject;
+
+        if(obj.CompareTag("Ground")) {
+            RB2D.velocity = Vector2.zero;
+
+        }
+
+        if(obj.CompareTag("Brick")) {
+
+   
+        }
+
+
+        yield return null;
     }
 }

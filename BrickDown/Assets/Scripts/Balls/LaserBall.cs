@@ -9,10 +9,11 @@ public class LaserBall : MonoBehaviour
     GameManager GM;
     public Rigidbody2D RB2D;
     public bool isMoving;
-    public float radius = 1f;
+    private int damage;
 
     void Start() {
         GM = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
+        damage = GM.upgradeWeapon[1];
     }
 
     public void Shot(Vector3 pos) {
@@ -31,7 +32,7 @@ public class LaserBall : MonoBehaviour
 
         if(obj.CompareTag("Brick")) {
 
-            Collider2D[] boomBricks = Physics2D.OverlapCircleAll(obj.transform.position, radius);
+            /*Collider2D[] boomBricks = Physics2D.OverlapCircleAll(obj.transform.position, radius);
 
             foreach(Collider2D boomBrick in boomBricks) {
                 if(boomBrick.CompareTag("Brick")) {
@@ -39,9 +40,9 @@ public class LaserBall : MonoBehaviour
                     int boomBrickValue = int.Parse(boomBrickText.text) - 1;
                 }
             }
-
+            */
         }
-
+        
 
         yield return null;
     }

@@ -11,16 +11,18 @@ public class GameManager : MonoBehaviour
     #region 자료
 
     public float lifelineY = 55.489f;
-    public GameObject NormalBall_P, Brick_P, GreenOrb_P;
-    public GameObject ParticleBlue_P, ParticleGreen_P, ParticleRed_P;
+    public GameObject Brick_P, GreenOrb_P;
+    public GameObject[] BallPrefabs = new GameObject[10];
+    public GameObject ParticleBlue_P, ParticleGreen_P, ParticleRed_P, ParticleBoom_P;
     public GameObject GameoverPanel;
     public GameObject NormalBallPreview,Arrow;
     public GameObject LeftBtn, RightBtn;
     public GameObject[] weaponSlot = new GameObject[10];
     
-    public NormalBall normalBall;
 
-    public Transform BallGroup, BrickGroup;
+    public Transform BrickGroup;
+    public Transform[] TotalBallGroup = new Transform[10];
+    public GameObject[] BallGroupObj = new GameObject[10];
 
     public LineRenderer Mouse_LR, Ball_LR;
     public TMP_Text ScoreText_TMP, MoneyText_TMP, EndScoreText_TMP;
@@ -68,11 +70,8 @@ public class GameManager : MonoBehaviour
         }
 
         shotAble = true;
-        for(int i = 0 ; i < BallGroup.childCount; i++) {
-            if(BallGroup.GetChild(i).GetComponent<NormalBall>().isMoving)
-                shotAble = false;
-        }
-        if(isBrickMoving)
+
+        if(!CheckShotAble())
             shotAble = false;
         if(!shotAble) return;
 
@@ -88,15 +87,24 @@ public class GameManager : MonoBehaviour
 
 
         bool isMouse = Input.GetMouseButton(0);
-        NormalBallPreview.SetActive(isMouse);
-        Arrow.SetActive(isMouse);
+
         if(isMouse) {
             secondPos_Mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0,0,10);
-
+            if((secondPos_Mouse - firstPos_Mouse).magnitude < 20) {
+                NormalBallPreview.SetActive(!isMouse);
+                Arrow.SetActive(!isMouse);
+                Mouse_LR.SetPosition(0,Vector3.zero);
+                Mouse_LR.SetPosition(1,Vector3.zero);
+                Ball_LR.SetPosition(0,Vector3.zero);
+                Ball_LR.SetPosition(1,Vector3.zero);
+                return;
+            }
             Mouse_LR.SetPosition(0,firstPos_Mouse);
             Mouse_LR.SetPosition(1,secondPos_Mouse);
 
-            if((secondPos_Mouse - firstPos_Mouse).magnitude < 1) return;
+            NormalBallPreview.SetActive(isMouse);
+            Arrow.SetActive(isMouse);
+
             gapPos = (secondPos_Mouse - firstPos_Mouse).normalized;
             gapPos = new Vector3(gapPos.y >= 0 ? (gapPos.x >= 0 ? 1 : -1) : gapPos.x , Mathf.Clamp(gapPos.y, -1f, -0.15f) , 0);
 
@@ -112,6 +120,17 @@ public class GameManager : MonoBehaviour
 
         }
         if(Input.GetMouseButtonUp(0)) {
+            if((secondPos_Mouse - firstPos_Mouse).magnitude < 20){
+                NormalBallPreview.SetActive(isMouse);
+                Arrow.SetActive(isMouse);
+                Mouse_LR.SetPosition(0,Vector3.zero);
+                Mouse_LR.SetPosition(1,Vector3.zero);
+                Ball_LR.SetPosition(0,Vector3.zero);
+                Ball_LR.SetPosition(1,Vector3.zero);
+                return;
+            }
+            NormalBallPreview.SetActive(isMouse);
+            Arrow.SetActive(isMouse);
             Mouse_LR.SetPosition(0,Vector3.zero);
             Mouse_LR.SetPosition(1,Vector3.zero);
             Ball_LR.SetPosition(0,Vector3.zero);
@@ -120,33 +139,72 @@ public class GameManager : MonoBehaviour
             ballStartPos = Vector3.zero;
             firstPos_Mouse = Vector3.zero;
             timerStart = true;
+            LeftBtn.SetActive(false);
+            RightBtn.SetActive(false);
         }
     }
 
     void FixedUpdate() { // 1초에 50번
-        if(timerStart && ++timerCount == 3) { // 0.06초 간격
+    
+        if(timerStart && ++timerCount == 3) {
             timerCount = 0;
-            BallGroup.GetChild(launchIndex++).GetComponent<NormalBall>().Shot(gapPos);
-            if(launchIndex == BallGroup.childCount) {
+            switch(nowWeapon) {
+                case 0:
+                    TotalBallGroup[0].GetChild(launchIndex++).GetComponent<NormalBall>().Shot(gapPos);
+                    if(launchIndex == TotalBallGroup[0].childCount) {
+                        timerStart = false;
+                        launchIndex = 0;
+                        timerCount = 0;
+                    }
+                    break;
+                case 1:
+                    TotalBallGroup[1].GetChild(0).GetComponent<LaserBall>().Shot(gapPos);
+                    timerStart = false;
+                    launchIndex = 0;
+                    timerCount = 0;
+                    break;
+                case 2:
+                    TotalBallGroup[2].GetChild(0).GetComponent<BoomBall>().Shot(gapPos);
+                    timerStart = false;
+                    launchIndex = 0;
+                    timerCount = 0; 
+                    break;
+                case 3:
+                    TotalBallGroup[3].GetChild(0).GetComponent<CrossBall>().Shot(gapPos);
+                    timerStart = false;
+                    launchIndex = 0;
+                    timerCount = 0;
+                    break;
+                case 4:
+                    TotalBallGroup[4].GetChild(0).GetComponent<BounceBall>().Shot(gapPos);
+                    timerStart = false;
+                    launchIndex = 0;
+                    timerCount = 0;
+                    break;
+            }
+        } 
+        
+        /*
+        if(timerStart && ++timerCount == 3 ) { // 0.06초 간격
+            timerCount = 0;
+            TotalBallGroup[0].GetChild(launchIndex++).GetComponent<NormalBall>().Shot(gapPos);
+            if(launchIndex == TotalBallGroup[0].childCount) {
                 timerStart = false;
                 launchIndex = 0;
                 timerCount = 0;
             }
         }
+        */
     }
     
-
-
-
-
     #region 게임시작 / 종료
 
     void Init() {
         score = 0;
         upgradeWeapon = SaveManager.instance.ReturnUpgrade();
-        SetWeapon();
         Vector3 start = new Vector3(0,54.87391f,0);
         SetStartPos(start);
+        SetWeapon();
         StartBrick();
     }
 
@@ -161,6 +219,14 @@ public class GameManager : MonoBehaviour
 
     public void SetWeapon() {
         nowWeapon = 0;
+        for(int i = 0 ; i < upgradeWeapon[0] ; i++) {
+            Instantiate(BallPrefabs[0], ballStartPos,Quaternion.identity).transform.SetParent(TotalBallGroup[0]);
+        }
+        for(int i = 1 ; i < 10 ; i++) {
+            if(upgradeWeapon[i] > 0) {
+                Instantiate(BallPrefabs[i], ballStartPos, Quaternion.identity).transform.SetParent(TotalBallGroup[i]);
+            }   
+        }
         if(upgradeWeapon[1] == 0) {
             LeftBtn.SetActive(false);
             RightBtn.SetActive(false);
@@ -187,8 +253,8 @@ public class GameManager : MonoBehaviour
                 isDie = true;
                 Gameover();
             }
-            for(int i = 0 ; i < BallGroup.childCount ; i++) {
-                BallGroup.GetChild(i).GetComponent<CircleCollider2D>().enabled = false;
+            for(int i = 0 ; i < TotalBallGroup[0].childCount ; i++) {
+                TotalBallGroup[0].GetChild(i).GetComponent<CircleCollider2D>().enabled = false;
             }
         }
 
@@ -239,6 +305,11 @@ public class GameManager : MonoBehaviour
             transform.GetChild(0).GetComponentInChildren<TMP_Text>().text = score.ToString();
 
             spawnList.RemoveAt(random);
+        }
+
+        if(upgradeWeapon[1] > 0) {
+            LeftBtn.SetActive(true);
+            RightBtn.SetActive(true);
         }
 
 
@@ -297,20 +368,54 @@ public class GameManager : MonoBehaviour
             if(weaponSlot[i] != null) {
                 weaponSlot[i].SetActive(false);
             }
+            if(BallGroupObj[i] != null) {
+                BallGroupObj[i].SetActive(false);
+            }
         }
         weaponSlot[nowWeapon].SetActive(true);
-    }
+        BallGroupObj[nowWeapon].SetActive(true);
+
+        for(int i = 0 ; i < TotalBallGroup[nowWeapon].childCount ; i++) {
+            TotalBallGroup[nowWeapon].GetChild(i).transform.position = ballStartPos;
+        }
+
+    }     
 
 
     #endregion
 
     #region 전체 Shot 관련
 
-    public void SetStartPos(Vector3 pos) {
+    public void SetStartPos(Vector3 pos) { //볼 출발지점 세팅
         if(ballStartPos == Vector3.zero) {
             ballStartPos = pos;
         }
     }
+    
+    public bool CheckShotAble() { // ShotAble 체크함수
+        if(isBrickMoving)
+            return false;    
+
+        for(int i = 0 ; i < TotalBallGroup[0].childCount; i++) {
+            if(TotalBallGroup[0].GetChild(i).GetComponent<NormalBall>().isMoving)
+                return false;
+        }
+
+        
+        if(upgradeWeapon[1] > 0 && TotalBallGroup[1].GetChild(0).GetComponent<LaserBall>().isMoving)
+            return false;
+        if(upgradeWeapon[2] > 0 && TotalBallGroup[2].GetChild(0).GetComponent<BoomBall>().isMoving)
+            return false;
+        if(upgradeWeapon[3] > 0 && TotalBallGroup[3].GetChild(0).GetComponent<CrossBall>().isMoving)
+            return false;
+        if(upgradeWeapon[4] > 0 && TotalBallGroup[4].GetChild(0).GetComponent<BounceBall>().isMoving)
+            return false;
+            
+
+        
+        return true;
+    }
+
 
     #endregion
 
@@ -323,6 +428,7 @@ public class GameManager : MonoBehaviour
         }
         RenewWeapon();
     }
+    
     public void PreviousWeapon() {
         nowWeapon--;
         if(nowWeapon<0) {
@@ -347,5 +453,6 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region 폭탄볼
+
     #endregion
 }

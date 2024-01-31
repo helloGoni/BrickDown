@@ -38,6 +38,7 @@ public class NormalBall : MonoBehaviour
                     yield break;
                 }
             }
+
         }
 
         if(obj.CompareTag("Brick")) {

@@ -67,6 +67,15 @@ public class SaveManager : MonoBehaviour
         if(endScore > data.highScore) {
             data.highScore = endScore;
         }
+        if(data.upgradeData[1] == 0 && endScore > 50) {
+            data.upgradeData[1] = 1;
+        }
+        if(data.upgradeData[2] == 0 && endScore > 100) {
+            data.upgradeData[2] = 1;
+        }
+        if(data.upgradeData[3] == 0 && endScore > 200) {
+            data.upgradeData[3] = 1;
+        }
         data.money += money;
         SaveData();
     }
@@ -92,4 +101,17 @@ public class SaveManager : MonoBehaviour
     }
     #endregion
 
+    #region 데이터 에디트 함수(삭제요망)
+
+    public void Addmoney() {
+        data.money += 1000;
+        SaveData();
+    }
+
+    public void UpgradeNormalBall() {
+        data.upgradeData[0]++;
+        SaveData();
+    }
+
+    #endregion
 }
