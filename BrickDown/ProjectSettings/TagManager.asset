@@ -9,6 +9,7 @@ TagManager:
   - Brick
   - GreenOrb
   - Ball
+  - MainWall
   layers:
   - Default
   - TransparentFX
@@ -24,7 +25,7 @@ TagManager:
   - 
   - Wall
   - 
-  - 
+  - Ground
   - 
   - 
   - 

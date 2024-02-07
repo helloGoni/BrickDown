@@ -16,7 +16,7 @@ public class BoomBall : MonoBehaviour
     void Start() {
         GM = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
         damage = GM.upgradeWeapon[2];
-        radius = 20f + (float)damage*0.005f;
+        radius = 20f + (float)damage*0.01f;
     }
 
     public void Shot(Vector3 pos) {
@@ -36,36 +36,32 @@ public class BoomBall : MonoBehaviour
             isMoving = false;
         }
 
-        if(colObj.CompareTag("Brick")) {
+        if(colObj.CompareTag("Brick") && isMoving) {
 
+            Collider2D[] boomBricks = Physics2D.OverlapCircleAll(transform.position/*colPoint*/, radius);
             Destroy(Instantiate(GM.ParticleBoom_P,colPoint, Quaternion.identity),1);
-            Collider2D[] boomBricks = Physics2D.OverlapCircleAll(colPoint, radius);
+            if(GM.impactOn)
+                GM.mainCamera.GetComponent<Animator>().SetTrigger("Boom");
+            if(GM.soundOn)
+                GM.BoomBall_AS.Play();
+            RB2D.velocity = Vector2.zero;
+            gameObject.GetComponent<TrailRenderer>().enabled = false;
+
 
             foreach(Collider2D boomBrick in boomBricks) {
                 if(boomBrick.CompareTag("Brick")) {
-                    TMP_Text hitBrickText = boomBrick.transform.GetChild(0).GetComponentInChildren<TMP_Text>();
-                    int hitBrickValue = int.Parse(hitBrickText.text) - damage;
-                    if( hitBrickValue > 0) {
-                        hitBrickText.text = hitBrickValue.ToString();
-                        colObj.GetComponent<Animator>().SetTrigger("Shock");
-                    } else {
-                        Destroy(colObj);
-                        GM.money += GM.score;
-                        Destroy(Instantiate(GM.ParticleRed_P, colObj.transform.position, Quaternion.identity),1);
-                    }
+                    boomBrick.GetComponent<Brick>().HitBrick(damage);
                 }
 
             }            
-
-            RB2D.velocity = Vector2.zero;
-            gameObject.GetComponent<TrailRenderer>().enabled = false;
             transform.position = new Vector2(col2D.contacts[0].point.x, GM.lifelineY);
             GM.SetStartPos(transform.position);
             isMoving = false;
             gameObject.GetComponent<TrailRenderer>().enabled = true;
+
         }
 
-        yield return null;
+            yield return null;
     }
 
     void OnDrawGizmos() {

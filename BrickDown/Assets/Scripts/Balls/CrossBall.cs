@@ -35,40 +35,49 @@ public class CrossBall : MonoBehaviour
         }
 
 
-        if(obj.CompareTag("Brick")) {
-            //obj.transform.position
-            Destroy(Instantiate(GM.ParticleBoom_P,colPoint, Quaternion.identity),1);
+        if(obj.CompareTag("Brick") && isMoving) {
 
-
+            Destroy(Instantiate(GM.ParticleCross_P,colPoint, Quaternion.identity),1);
+            Destroy(Instantiate(GM.ParticleCross_P,colPoint, Quaternion.Euler(new Vector3(0,0,90))),1);
+            Destroy(Instantiate(GM.ParticleCross_P,colPoint, Quaternion.Euler(new Vector3(0,0,180))),1);
+            Destroy(Instantiate(GM.ParticleCross_P,colPoint, Quaternion.Euler(new Vector3(0,0,270))),1);
+            if(GM.soundOn)
+                GM.CrossBall_AS.Play();
+            Destroy(Instantiate(GM.ParticleWhite_P,colPoint, Quaternion.identity),1);
             RaycastHit2D[] hitDown = Physics2D.RaycastAll(colPoint,Vector2.down, 100);
             RaycastHit2D[] hitUp = Physics2D.RaycastAll(colPoint,Vector2.up, 100);
             RaycastHit2D[] hitRight = Physics2D.RaycastAll(colPoint,Vector2.right, 100);
             RaycastHit2D[] hitLeft = Physics2D.RaycastAll(colPoint, Vector2.left, 100);
 
+            obj.GetComponent<Brick>().HitBrick(damage);
 
-/*
-            foreach(Collider2D boomBrick in boomBricks) {
-                if(boomBrick.CompareTag("Brick")) {
-                    TMP_Text hitBrickText = boomBrick.transform.GetChild(0).GetComponentInChildren<TMP_Text>();
-                    int hitBrickValue = int.Parse(hitBrickText.text) - 1;
-                    if( hitBrickValue > 0) {
-                        hitBrickText.text = hitBrickValue.ToString();
-                        obj.GetComponent<Animator>().SetTrigger("Shock");
-                    } else {
-                        Destroy(obj);
-                        GM.money += GM.score;
-                        Destroy(Instantiate(GM.ParticleRed_P, obj.transform.position, Quaternion.identity),1);
-                    }
+            foreach(RaycastHit2D hitBrick in hitDown) {
+                if(hitBrick.collider.CompareTag("Brick") && hitBrick.collider.gameObject != obj) {
+                    hitBrick.collider.GetComponent<Brick>().HitBrick(damage);
                 }
+            }
+            foreach(RaycastHit2D hitBrick in hitUp) {
+                if(hitBrick.collider.CompareTag("Brick") && hitBrick.collider.gameObject != obj) {
+                    hitBrick.collider.GetComponent<Brick>().HitBrick(damage);
+                }
+            }
+            foreach(RaycastHit2D hitBrick in hitRight) {
+                if(hitBrick.collider.CompareTag("Brick") && hitBrick.collider.gameObject != obj) {
+                    hitBrick.collider.GetComponent<Brick>().HitBrick(damage);
+                }
+            }
+            foreach(RaycastHit2D hitBrick in hitLeft) {
+                if(hitBrick.collider.CompareTag("Brick") && hitBrick.collider.gameObject != obj) {
+                    hitBrick.collider.GetComponent<Brick>().HitBrick(damage);
+                }
+            }
 
-            }            
-*/
+
             RB2D.velocity = Vector2.zero;
-            gameObject.GetComponent<TrailRenderer>().enabled = false;
             transform.position = new Vector2(col2D.contacts[0].point.x, GM.lifelineY);
             GM.SetStartPos(transform.position);
             isMoving = false;
-            gameObject.GetComponent<TrailRenderer>().enabled = true;
+
 
 
 

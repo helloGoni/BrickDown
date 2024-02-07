@@ -11,14 +11,19 @@ public class NormalBall : MonoBehaviour
     public Rigidbody2D RB2D;
     public bool isMoving;
 
+    private int speed;
+
+
     void Start() {
         GM = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
+        speed = 7000 + GM.upgradeWeapon[0]*50;
     }
 
     public void Shot(Vector3 pos) {
+        speed = 7000 + GM.upgradeWeapon[0]*50;
         GM.shotTrigger = true;
         isMoving = true;
-        RB2D.AddForce(pos * 7000);
+        RB2D.AddForce(pos * speed);
     }
 
     IEnumerator OnCollisionEnter2D(Collision2D col2D) {
@@ -41,20 +46,16 @@ public class NormalBall : MonoBehaviour
 
         }
 
-        if(obj.CompareTag("Brick")) {
-            TMP_Text brickText = obj.transform.GetChild(0).GetComponentInChildren<TMP_Text>();
-            int brickValue = int.Parse(brickText.text) - 1;
+        if(obj.CompareTag("Brick") && isMoving) {
+            obj.GetComponent<Brick>().HitBrick(1);
+            if(GM.soundOn)
+                for(int i = 0 ; i < GM.NormalBall_AS.Length ; i++) {
+                    if(!GM.NormalBall_AS[i].isPlaying) {
+                        GM.NormalBall_AS[i].Play();
+                        break;
+                    }
+                }
 
-            //for(int i = 0 ; i < GM.B) // 사운드
-
-            if( brickValue > 0) {
-                brickText.text = brickValue.ToString();
-                obj.GetComponent<Animator>().SetTrigger("Shock");
-            } else {
-                Destroy(obj);
-                GM.money += GM.score;
-                Destroy(Instantiate(GM.ParticleRed_P, obj.transform.position, Quaternion.identity),1);
-            }
         }
         //가로로만 움직이는 경우
         Vector2 pos = RB2D.velocity.normalized;

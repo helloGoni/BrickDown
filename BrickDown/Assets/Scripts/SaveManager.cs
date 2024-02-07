@@ -53,7 +53,6 @@ public class SaveManager : MonoBehaviour
             SaveData();
             return true;
         } else {
-            Debug.Log("돈 부족 ");
             return false;
         }
     }
@@ -67,6 +66,7 @@ public class SaveManager : MonoBehaviour
         if(endScore > data.highScore) {
             data.highScore = endScore;
         }
+        /*
         if(data.upgradeData[1] == 0 && endScore > 50) {
             data.upgradeData[1] = 1;
         }
@@ -76,6 +76,7 @@ public class SaveManager : MonoBehaviour
         if(data.upgradeData[3] == 0 && endScore > 200) {
             data.upgradeData[3] = 1;
         }
+        */
         data.money += money;
         SaveData();
     }
@@ -99,6 +100,8 @@ public class SaveManager : MonoBehaviour
     public int[] ReturnUpgrade() {
         return data.upgradeData;
     }
+
+
     #endregion
 
     #region 데이터 에디트 함수(삭제요망)
