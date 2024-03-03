@@ -6,17 +6,25 @@ using UnityEngine.UI;
 using TMPro;
 
 
-//광고 수정
-//박스때릴때shock안댐
+//박스때릴때shock적용이 이상
+//메인메뉴 박스
+//음악X일때 이상
 
 public class MainManager : MonoBehaviour
 {
     #region 데이터
 
-    public TMP_Text scoreText, moneyText;
+    public TMP_Text highScoreText_TMP, moneyText_TMP;
     public GameObject MainBall, ShopPanel, ParticleMain;
-    public GameObject BallGroup, WallGroup, BrickGroup;
-    public AudioSource MainBGM;
+
+    [Header ("Bundle Group")]
+    public GameObject ballGroup;
+    public GameObject wallGroup;
+    public GameObject brickGroup;
+    
+    [Space (10f)]
+    public AudioSource mainBGM_AS;
+
     #endregion
 
 
@@ -25,8 +33,8 @@ public class MainManager : MonoBehaviour
     }
 
     public void RenewText() {
-        scoreText.text = SaveManager.instance.ReturnScore().ToString() + " Round";
-        moneyText.text = SaveManager.instance.ReturnMoney().ToString();
+        highScoreText_TMP.text = SaveManager.instance.ReturnScore().ToString() + " Round";
+        moneyText_TMP.text = SaveManager.instance.ReturnMoney().ToString();
     }
 
     public void PlayGame() {
@@ -36,9 +44,9 @@ public class MainManager : MonoBehaviour
     public void PushShopBtn() {
         MainBall.GetComponent<MainBall>().isShot = false;
         ShopPanel.SetActive(true);
-        BallGroup.SetActive(false);
-        WallGroup.SetActive(false);
-        BrickGroup.SetActive(false);
+        ballGroup.SetActive(false);
+        wallGroup.SetActive(false);
+        brickGroup.SetActive(false);
     }
 
     public void ReturnMainBtn() {
@@ -52,16 +60,16 @@ public class MainManager : MonoBehaviour
             PlayerPrefs.SetInt("BGM",1);
         }
         if(PlayerPrefs.GetInt("BGM") == 0) {
-            MainBGM.Stop();
+            mainBGM_AS.Stop();
         }
-        WallGroup.SetActive(true);
+        wallGroup.SetActive(true);
         if(SaveManager.instance.ReturnScore() == 0) { 
-            BallGroup.SetActive(false);
-            BrickGroup.SetActive(false);
+            ballGroup.SetActive(false);
+            brickGroup.SetActive(false);
         } else {                
             Destroy(Instantiate(ParticleMain,new Vector3(0,0,0), Quaternion.identity),1);
-            BallGroup.SetActive(true);
-            BrickGroup.SetActive(true);
+            ballGroup.SetActive(true);
+            brickGroup.SetActive(true);
             MainBall.GetComponent<MainBall>().isShot = true;    
             MainBall.GetComponent<MainBall>().Shot();
 
@@ -69,11 +77,11 @@ public class MainManager : MonoBehaviour
     }
 
     public void ToggleBGM() {
-        if( MainBGM.isPlaying) {
-            MainBGM.Stop();
+        if( mainBGM_AS.isPlaying) {
+            mainBGM_AS.Stop();
             PlayerPrefs.SetInt("BGM",0);
         } else {
-            MainBGM.Play();
+            mainBGM_AS.Play();
             PlayerPrefs.SetInt("BGM",1);
         }
     }

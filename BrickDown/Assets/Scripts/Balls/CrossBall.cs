@@ -4,13 +4,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class CrossBall : MonoBehaviour
+public class CrossBall : MonoBehaviour, IBall
 {
     GameManager GM;
     public Rigidbody2D RB2D;
-    public bool isMoving;
+    public bool isMoving { get; set; }
 
     private int damage;
+    private const int BALL_SPEED = 7000;
 
     void Start() {
         GM = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
@@ -37,12 +38,12 @@ public class CrossBall : MonoBehaviour
 
         if(obj.CompareTag("Brick") && isMoving) {
 
-            Destroy(Instantiate(GM.ParticleCross_P,colPoint, Quaternion.identity),1);
-            Destroy(Instantiate(GM.ParticleCross_P,colPoint, Quaternion.Euler(new Vector3(0,0,90))),1);
-            Destroy(Instantiate(GM.ParticleCross_P,colPoint, Quaternion.Euler(new Vector3(0,0,180))),1);
-            Destroy(Instantiate(GM.ParticleCross_P,colPoint, Quaternion.Euler(new Vector3(0,0,270))),1);
+            Destroy(Instantiate(GM.ParticleCross_P,obj.transform.position, Quaternion.identity),1);
+            Destroy(Instantiate(GM.ParticleCross_P,obj.transform.position, Quaternion.Euler(new Vector3(0,0,90))),1);
+            Destroy(Instantiate(GM.ParticleCross_P,obj.transform.position, Quaternion.Euler(new Vector3(0,0,180))),1);
+            Destroy(Instantiate(GM.ParticleCross_P,obj.transform.position, Quaternion.Euler(new Vector3(0,0,270))),1);
             if(GM.soundOn)
-                GM.CrossBall_AS.Play();
+                GM.SM.PlayCrossBall();
             Destroy(Instantiate(GM.ParticleWhite_P,colPoint, Quaternion.identity),1);
             RaycastHit2D[] hitDown = Physics2D.RaycastAll(colPoint,Vector2.down, 100);
             RaycastHit2D[] hitUp = Physics2D.RaycastAll(colPoint,Vector2.up, 100);

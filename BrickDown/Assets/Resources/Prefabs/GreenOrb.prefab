@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8938153073489260494}
   - component: {fileID: 4308597102112222345}
   - component: {fileID: 3357709478795033145}
+  - component: {fileID: 2379187313454234764}
   m_Layer: 0
   m_Name: GreenOrb
   m_TagString: GreenOrb
@@ -102,6 +103,18 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 3.28
+--- !u!114 &2379187313454234764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 95417249671847691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57a2abf80a5982243afddf1bce38d5be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4941172281330448253
 GameObject:
   m_ObjectHideFlags: 0

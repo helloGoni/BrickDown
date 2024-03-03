@@ -2,13 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+
+//brickType 0 : 기본 1 : 물음표
+
 public class Brick : MonoBehaviour
 {
-    public int brickType; //0이면 기본 1이면 물음표
-    public int brickValue;
-    public TMP_Text brickText;
+    private int brickType; 
+    private int brickValue;
+    public TMP_Text brickText_TMP;
     public GameManager GM;
-    public SpriteRenderer SR;
+    public SpriteRenderer brick_SR;
 
     void Start() {
         GM = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
@@ -18,8 +21,8 @@ public class Brick : MonoBehaviour
         brickType = type;
         brickValue = value;
         if(brickType == 0)
-            brickText.text = brickValue.ToString();
-        else    brickText.text = "?";
+            brickText_TMP.text = brickValue.ToString();
+        else    brickText_TMP.text = "?";
         ChangeColor();
     }
 
@@ -49,8 +52,8 @@ public class Brick : MonoBehaviour
         brickValue -= damage;
 
         if(brickValue > 0) {
-            if(brickType == 1) brickText.text = "?";
-            else brickText.text = brickValue.ToString();
+            if(brickType == 1) brickText_TMP.text = "?";
+            else brickText_TMP.text = brickValue.ToString();
             ChangeColor();
             gameObject.GetComponent<Animator>().SetTrigger("Shock");
 
@@ -69,13 +72,13 @@ public class Brick : MonoBehaviour
 
     private void ChangeColor() {
         if(brickType == 1) { 
-            SR.color = new Color32(165, 100, 255, 255);
+            brick_SR.color = new Color32(165, 100, 255, 255);
         } else {
             if(brickValue >= 495) {
-                SR.color = new Color32(255, 30, 81, 255);
+                brick_SR.color = new Color32(255, 30, 81, 255);
             } else {
                 int colorValue = 9*((495-brickValue)/55) + 30;
-                SR.color = new Color(255f / 255f, (float)colorValue / 255f, 81 / 255f, 255 / 255f);
+                brick_SR.color = new Color(255f / 255f, (float)colorValue / 255f, 81 / 255f, 255 / 255f);
             } 
             //255 65 81
             //30 45 60 75 90 105 120

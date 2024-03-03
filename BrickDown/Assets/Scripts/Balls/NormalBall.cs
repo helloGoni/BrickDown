@@ -4,26 +4,23 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class NormalBall : MonoBehaviour
+public class NormalBall : MonoBehaviour, IBall
 {
     GameManager GM;
 
     public Rigidbody2D RB2D;
-    public bool isMoving;
 
-    private int speed;
-
+    public bool isMoving { get; set; }
+    const int BALL_SPEED = 8000;
 
     void Start() {
-        GM = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
-        speed = 7000 + GM.upgradeWeapon[0]*50;
+        GM = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();        
     }
 
     public void Shot(Vector3 pos) {
-        speed = 7000 + GM.upgradeWeapon[0]*50;
         GM.shotTrigger = true;
         isMoving = true;
-        RB2D.AddForce(pos * speed);
+        RB2D.AddForce(pos * BALL_SPEED);
     }
 
     IEnumerator OnCollisionEnter2D(Collision2D col2D) {
@@ -49,12 +46,7 @@ public class NormalBall : MonoBehaviour
         if(obj.CompareTag("Brick") && isMoving) {
             obj.GetComponent<Brick>().HitBrick(1);
             if(GM.soundOn)
-                for(int i = 0 ; i < GM.NormalBall_AS.Length ; i++) {
-                    if(!GM.NormalBall_AS[i].isPlaying) {
-                        GM.NormalBall_AS[i].Play();
-                        break;
-                    }
-                }
+                GM.SM.PlayNormalBall();
 
         }
         //가로로만 움직이는 경우

@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BounceBall : MonoBehaviour
+public class BounceBall : MonoBehaviour//, IBall
 {
+    /*
     GameManager GM;
     public Rigidbody2D RB2D;
     public bool isMoving;
@@ -34,4 +35,5 @@ public class BounceBall : MonoBehaviour
 
         yield return null;
     }
+    */
 }

@@ -4,12 +4,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class BoomBall : MonoBehaviour
+public class BoomBall : MonoBehaviour, IBall
 {
     GameManager GM;
     public Rigidbody2D RB2D;
-    public bool isMoving;
+    public bool isMoving { get; set; }
 
+    const int BALL_SPEED = 7000;
     private float radius;
     private int damage;
 
@@ -22,7 +23,7 @@ public class BoomBall : MonoBehaviour
     public void Shot(Vector3 pos) {
         GM.shotTrigger = true;
         isMoving = true;
-        RB2D.AddForce(pos * 7000);
+        RB2D.AddForce(pos * BALL_SPEED);
     }
 
     IEnumerator OnCollisionEnter2D(Collision2D col2D) {
@@ -43,7 +44,7 @@ public class BoomBall : MonoBehaviour
             if(GM.impactOn)
                 GM.mainCamera.GetComponent<Animator>().SetTrigger("Boom");
             if(GM.soundOn)
-                GM.BoomBall_AS.Play();
+                GM.SM.PlayBoomBall();
             RB2D.velocity = Vector2.zero;
             gameObject.GetComponent<TrailRenderer>().enabled = false;
 

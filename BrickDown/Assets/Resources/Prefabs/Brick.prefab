@@ -332,11 +332,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0162de1203e1b3848b75343e01d01b53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  brickType: 0
-  brickValue: 0
-  brickText: {fileID: 9158156136385803202}
+  brickText_TMP: {fileID: 9158156136385803202}
   GM: {fileID: 0}
-  SR: {fileID: 9158156135320716123}
+  brick_SR: {fileID: 9158156135320716123}
 --- !u!1 &9158156136385803200
 GameObject:
   m_ObjectHideFlags: 0

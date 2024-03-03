@@ -16,7 +16,10 @@ public class MainBall : MonoBehaviour
     }
 
     void Update() {
-        if(isShot == true && (RB2D.velocity.magnitude < new Vector2(0.1f,0.1f).magnitude)) Shot();
+        if(isShot == true && (RB2D.velocity.magnitude < new Vector2(0.1f,0.1f).magnitude)) {
+            RB2D.velocity = new Vector2(0,0);
+            Shot();
+        }
     }
 
     public void Shot() {

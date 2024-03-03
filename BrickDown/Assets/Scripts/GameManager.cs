@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
 
     #region 자료
 
-    public float lifelineY = 55.489f;
+    public float lifelineY = 55.489f; // const지정
     public GameObject Brick_P, GreenOrb_P;
     public GameObject[] BallPrefabs = new GameObject[10];
 
@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
     public Camera mainCamera;
 
 
-    public Transform BrickGroup;
+    public Transform BrickGroup, StarGroup;
     public Transform[] TotalBallGroup = new Transform[10];
     public GameObject[] BallGroupObj = new GameObject[10];
 
@@ -32,13 +32,7 @@ public class GameManager : MonoBehaviour
     public TMP_Text ScoreText_TMP, MoneyText_TMP, EndScoreText_TMP, EndMoneyText_TMP, SoundText_TMP, ImpactText_TMP;
     public TMP_Text[] WeaponSlotValue = new TMP_Text[10];
 
-    public Color[] brickColor;
-    public Color greenColor;
-
-    public AudioSource Gameover_AS, GreenOrb_AS, Plus_AS;
-    public AudioSource[] NormalBall_AS;
-    public AudioSource LaserBall_AS, BoomBall_AS, CrossBall_AS;
-    
+    public SoundManager SM;
 
     public Vector3 firstPos_Mouse, secondPos_Mouse, gapPos, ballStartPos;
     public int score, timerCount, launchIndex, money;
@@ -69,6 +63,7 @@ public class GameManager : MonoBehaviour
     }
 
     void Update() {
+
         if(isDie) return;
 
         if(Input.GetMouseButtonDown(0)) {
@@ -89,8 +84,6 @@ public class GameManager : MonoBehaviour
 
         timeDelay += Time.deltaTime;
         if(timeDelay < 0.1f) return; //너무빨리손떼면 라인 안사라져서 버그수정
-
-
 
         bool isMouse = Input.GetMouseButton(0);
 
@@ -116,7 +109,7 @@ public class GameManager : MonoBehaviour
 
             Arrow.transform.position = ballStartPos;
             Arrow.transform.rotation = Quaternion.Euler(0,0,Mathf.Atan2(gapPos.y,gapPos.x) * Mathf.Rad2Deg);
-            //아래 수정 확실히 이해
+           
             NormalBallPreview.transform.position = Physics2D.CircleCast(new Vector2(Mathf.Clamp(ballStartPos.x,-54,54),lifelineY),1.7f,gapPos,10000,
                                                                         1 << LayerMask.NameToLayer("Wall") | 1 << LayerMask.NameToLayer("Brick")).centroid;
             RaycastHit2D hit2D = Physics2D.Raycast(ballStartPos, gapPos, 10000, 1 << LayerMask.NameToLayer("Wall"));
@@ -150,44 +143,18 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void FixedUpdate() { // 1초에 50번
+    void FixedUpdate() { 
     
         if(timerStart && ++timerCount == 3) {
             timerCount = 0;
-            switch(nowWeapon) {
-                case 0:
-                    TotalBallGroup[0].GetChild(launchIndex++).GetComponent<NormalBall>().Shot(gapPos);
-                    if(launchIndex == TotalBallGroup[0].childCount) {
-                        timerStart = false;
-                        launchIndex = 0;
-                        timerCount = 0;
-                    }
-                    break;
-                case 1:
-                    TotalBallGroup[1].GetChild(0).GetComponent<LaserBall>().Shot(gapPos);
-                    timerStart = false;
-                    launchIndex = 0;
-                    timerCount = 0;
-                    break;
-                case 2:
-                    TotalBallGroup[2].GetChild(0).GetComponent<BoomBall>().Shot(gapPos);
-                    timerStart = false;
-                    launchIndex = 0;
-                    timerCount = 0; 
-                    break;
-                case 3:
-                    TotalBallGroup[3].GetChild(0).GetComponent<CrossBall>().Shot(gapPos);
-                    timerStart = false;
-                    launchIndex = 0;
-                    timerCount = 0;
-                    break;
-                case 4:
-                    TotalBallGroup[4].GetChild(0).GetComponent<BounceBall>().Shot(gapPos);
-                    timerStart = false;
-                    launchIndex = 0;
-                    timerCount = 0;
-                    break;
+
+            TotalBallGroup[nowWeapon].GetChild(launchIndex++).GetComponent<IBall>().Shot(gapPos);
+            if(launchIndex == TotalBallGroup[nowWeapon].childCount) {
+                timerStart = false;
+                launchIndex = 0;
+                timerCount = 0;
             }
+
         } 
     }
     
@@ -274,6 +241,12 @@ public class GameManager : MonoBehaviour
               Gameover();
             }  
         }
+        for(int i = 0 ; i < StarGroup.childCount ; i++) {
+            StartCoroutine(StarGroup.GetChild(i).GetComponent<Star>().MoveUpStar());
+            if(StarGroup.GetChild(i).position.y > 35) {
+                StarGroup.GetChild(i).GetComponent<Star>().DeleteStar();
+            }
+        }
         isBrickMoving = false;
         yield return null;
     }
@@ -313,7 +286,9 @@ public class GameManager : MonoBehaviour
 
             spawnList.RemoveAt(random);
         }
-
+        
+        Instantiate(GreenOrb_P, spawnList[Random.Range(0,spawnList.Count)], Quaternion.identity).transform.SetParent(StarGroup);
+        
         if(upgradeWeapon[1] > 0) {
             LeftBtn.SetActive(true);
             RightBtn.SetActive(true);
@@ -346,6 +321,8 @@ public class GameManager : MonoBehaviour
 
             spawnList.RemoveAt(random);
         }
+
+        Instantiate(GreenOrb_P, spawnList[Random.Range(0,spawnList.Count)], Quaternion.identity).transform.SetParent(StarGroup);
     }
 
 
@@ -430,8 +407,10 @@ public class GameManager : MonoBehaviour
             return false;
         if(upgradeWeapon[3] > 0 && TotalBallGroup[3].GetChild(0).GetComponent<CrossBall>().isMoving)
             return false;
+            /*
         if(upgradeWeapon[4] > 0 && TotalBallGroup[4].GetChild(0).GetComponent<BounceBall>().isMoving)
             return false;
+            */
 
         return true;
     }

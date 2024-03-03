@@ -4,24 +4,23 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class LaserBall : MonoBehaviour
+public class LaserBall : MonoBehaviour, IBall
 {
     GameManager GM;
-    public bool isMoving;
+    public bool isMoving { get; set; }
     public Rigidbody2D RB2D;
     private int damage;
-    private int speed;
+    private const int BALL_SPEED = 7000;
 
     void Start() {
         GM = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
         damage = GM.upgradeWeapon[1];
-        speed = 7000;
     }
 
     public void Shot(Vector3 pos) {
         GM.shotTrigger = true;
         isMoving = true;
-        RB2D.AddForce(pos * speed);
+        RB2D.AddForce(pos * BALL_SPEED);
     }
 
     IEnumerator OnCollisionEnter2D(Collision2D col2D) {
@@ -44,7 +43,7 @@ public class LaserBall : MonoBehaviour
         if(obj.CompareTag("Brick") && isMoving) {
             obj.GetComponent<Brick>().HitBrick(damage);
             if(GM.soundOn)
-                GM.LaserBall_AS.Play();  
+                GM.SM.PlayLaserBall();  
         }
 
         //가로로만 움직이는 경우
